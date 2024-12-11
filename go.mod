@@ -1,3 +1,3 @@
-module github.com/things-go/sets
+module github.com/thinkgos/sets
 
 go 1.22
