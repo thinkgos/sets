@@ -57,15 +57,45 @@ func (s Set[T]) Intersection(s2 Set[T]) Set[T] {
 	return ret
 }
 
-// Diff returns s diff of s2, return added, removed, remained sets
+// Vary returns s vary of s2, return added, removed sets
 // with the given s2 set.
 // For example:
 // s1 = {a1, a3, a5, a7}
 // s2 = {a3, a4, a5, a6}
 // added = {a4, a6}
 // removed = {a1, a7}
+func (s Set[T]) Vary(s2 Set[T]) (added, removed Set[T]) {
+	removed = newSet[T](len(s))
+	added = newSet[T](len(s2))
+	for key := range s {
+		if !s2.Contains(key) {
+			removed[key] = struct{}{}
+		}
+	}
+	for key := range s2 {
+		if !s.Contains(key) {
+			added[key] = struct{}{}
+		}
+	}
+	return added, removed
+}
+
+// DiffVary returns s vary of s2, return added, removed sets
+// with the given s2 set.
+//
+// Deprecated: use Vary instead.
+func (s Set[T]) DiffVary(s2 Set[T]) (added, removed Set[T]) {
+	return s.Vary(s2)
+}
+
+// VaryIntersection returns s vary of s2, return added, removed, remained sets with the given s2 set.
+// For example:
+// s1 = {a1, a3, a5, a7}
+// s2 = {a3, a4, a5, a6}
+// added = {a4, a6}
+// removed = {a1, a7}
 // remained = {a3, a6}
-func (s Set[T]) Diff(s2 Set[T]) (added, removed, remained Set[T]) {
+func (s Set[T]) VaryIntersection(s2 Set[T]) (added, removed, remained Set[T]) {
 	removed = newSet[T](len(s))
 	added = newSet[T](len(s2))
 	remained = newSet[T](len(s))
@@ -84,27 +114,11 @@ func (s Set[T]) Diff(s2 Set[T]) (added, removed, remained Set[T]) {
 	return added, removed, remained
 }
 
-// DiffVary returns s diff of s2, return added, removed sets
-// with the given s2 set.
-// For example:
-// s1 = {a1, a3, a5, a7}
-// s2 = {a3, a4, a5, a6}
-// added = {a4, a6}
-// removed = {a1, a7}
-func (s Set[T]) DiffVary(s2 Set[T]) (added, removed Set[T]) {
-	removed = newSet[T](len(s))
-	added = newSet[T](len(s2))
-	for key := range s {
-		if !s2.Contains(key) {
-			removed[key] = struct{}{}
-		}
-	}
-	for key := range s2 {
-		if !s.Contains(key) {
-			added[key] = struct{}{}
-		}
-	}
-	return added, removed
+// Diff returns s vary of s2, return added, removed, remained sets with the given s2 set.
+//
+// Deprecated: use VaryIntersection instead.
+func (s Set[T]) Diff(s2 Set[T]) (added, removed, remained Set[T]) {
+	return s.VaryIntersection(s2)
 }
 
 //* diff slices
@@ -168,7 +182,38 @@ func (s Set[T]) IntersectionSlice(s2 Set[T]) []T {
 	return ret
 }
 
-// DiffSlice returns s diff of s2, return added, removed, remained slices
+// VarySlice returns s vary of s2, return added, removed slices
+// with the given s2 set.
+// For example:
+// s1 = {a1, a3, a5, a7}
+// s2 = {a3, a4, a5, a6}
+// added = {a4, a6}
+// removed = {a1, a7}
+func (s Set[T]) VarySlice(s2 Set[T]) (added, removed []T) {
+	removed = make([]T, 0, len(s))
+	added = make([]T, 0, len(s2))
+	for key := range s {
+		if !s2.Contains(key) {
+			removed = append(removed, key)
+		}
+	}
+	for key := range s2 {
+		if !s.Contains(key) {
+			added = append(added, key)
+		}
+	}
+	return added, removed
+}
+
+// DiffVarySlice returns s vary of s2, return added, removed slices
+// with the given s2 set.
+//
+// Deprecated: use VarySlice instead.
+func (s Set[T]) DiffVarySlice(s2 Set[T]) (added, removed []T) {
+	return s.VarySlice(s2)
+}
+
+// DiffSlice returns s vary of s2, return added, removed, remained slices
 // with the given s2 set.
 // For example:
 // s1 = {a1, a3, a5, a7}
@@ -176,7 +221,7 @@ func (s Set[T]) IntersectionSlice(s2 Set[T]) []T {
 // added = {a4, a6}
 // removed = {a1, a7}
 // remained = {a3, a6}
-func (s Set[T]) DiffSlice(s2 Set[T]) (added, removed, remained []T) {
+func (s Set[T]) VaryIntersectionSlice(s2 Set[T]) (added, removed, remained []T) {
 	removed = make([]T, 0, len(s))
 	added = make([]T, 0, len(s2))
 	remained = make([]T, 0, len(s))
@@ -195,25 +240,10 @@ func (s Set[T]) DiffSlice(s2 Set[T]) (added, removed, remained []T) {
 	return added, removed, remained
 }
 
-// DiffVarySlice returns s diff of s2, return added, removed slices
+// DiffSlice returns s vary of s2, return added, removed, remained slices
 // with the given s2 set.
-// For example:
-// s1 = {a1, a3, a5, a7}
-// s2 = {a3, a4, a5, a6}
-// added = {a4, a6}
-// removed = {a1, a7}
-func (s Set[T]) DiffVarySlice(s2 Set[T]) (added, removed []T) {
-	removed = make([]T, 0, len(s))
-	added = make([]T, 0, len(s2))
-	for key := range s {
-		if !s2.Contains(key) {
-			removed = append(removed, key)
-		}
-	}
-	for key := range s2 {
-		if !s.Contains(key) {
-			added = append(added, key)
-		}
-	}
-	return added, removed
+//
+// Deprecated: use VaryIntersectionSlice instead.
+func (s Set[T]) DiffSlice(s2 Set[T]) (added, removed, remained []T) {
+	return s.VaryIntersectionSlice(s2)
 }
