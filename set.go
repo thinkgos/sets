@@ -124,13 +124,20 @@ func (s Set[T]) Clone() Set[T] {
 	return NewFrom(s)
 }
 
-// List returns the contents as a sorted slice.
-func (s Set[T]) List() []T {
+// Values returns the value of the sets.
+func (s Set[T]) Values() []T {
 	res := make([]T, 0, len(s))
 	for key := range s {
 		res = append(res, key)
 	}
 	return res
+}
+
+// List returns the value of the sets.
+//
+// Deprecated: use Values instead.
+func (s Set[T]) List() []T {
+	return s.Values()
 }
 
 // Each traverses the items in the Set, calling the provided function for each
